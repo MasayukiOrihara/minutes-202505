@@ -2,6 +2,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
+"""
+whisperによる文字起こし
+"""
+
 # .envの読み込み
 load_dotenv()
 
@@ -9,10 +13,10 @@ load_dotenv()
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 
 # 保存先のパス
-file_path = r"C:\localGit\python\minutes\data\output.txt"
+file_path = "data/20250508/output_raw2.txt"
 
 # 音声ファイルを開く
-with open("data/output001.m4a", "rb") as audio_file:
+with open("data/20250508/output_part_004.m4a", "rb") as audio_file:
   transcript = client.audio.transcriptions.create(
     model="whisper-1",
     file=audio_file,
