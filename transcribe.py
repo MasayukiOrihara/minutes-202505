@@ -13,10 +13,10 @@ load_dotenv()
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
 
 # 保存先のパス
-file_path = "data/20250508/output_raw2.txt"
+file_path = "data/20250509/output_raw1_.txt"
 
 # 音声ファイルを開く
-with open("data/20250508/output_part_004.m4a", "rb") as audio_file:
+with open("data/20250509/2025OJT1_008.m4a", "rb") as audio_file:
   transcript = client.audio.transcriptions.create(
     model="whisper-1",
     file=audio_file,
