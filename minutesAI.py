@@ -5,8 +5,15 @@ import subprocess
 from openai import OpenAI
 from dotenv import load_dotenv
 
+'''
+
+議事録AI「Giron」
+ver. 0.1
+
+'''
+
 # パスの指定
-input_file_path = "data/20250509/20250509_mtg.m4a"
+input_file_path = "data/20250509/2025OJT3_cut.m4a"
 output_file_path = "data/20250509/transcript.txt"
 final_file_path = "data/20250509/minutes.txt"
 
@@ -77,14 +84,30 @@ with open(output_file_path, "w+", encoding="utf-8") as out_f:
 ・口語→文語
 ・要約
 """
+# 文字数が長すぎる場合分割をする
+def split_text_by_chars(text, max_chars=20000):
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + max_chars
+        chunk = text[start:end]
+        chunks.append(chunk)
+        start = end
+    return chunks
+
+chunks = split_text_by_chars(transcription_text)
+
+# 解決策が浮かぶまで最初の部分のみ
+split_text = chunks[0]
+
 # 口語 → 文語
 response1 =  client.chat.completions.create(
     model="gpt-4.1",
     messages=[
         {"role": "system", "content": "あなたはプロの文章校正者です。グループワークでの会話を書き起こした口語文を会話の流れが分かるように文語文にしてください。"},
-        {"role": "user", "content": transcription_text}
+        {"role": "user", "content": split_text}
     ],
-    temperature=0.3
+    temperature=0.2
 )
 change = response1.choices[0].message.content
 
@@ -92,10 +115,10 @@ change = response1.choices[0].message.content
 response2 =  client.chat.completions.create(
     model="gpt-4.1",
     messages=[
-        {"role": "system", "content": "あなたはプロの議事録作成者です。会議中に話された内容を文語にまとめたものを、箇条書きで流れと結論が分かるように要約をしてください。"},
+        {"role": "system", "content": "あなたはプロの議事録作成者です。会議中に話された内容を文語にまとめたものを、大きなトピックに分け箇条書きでまとめてください。情報が不明瞭で結論に推測が多く含まれる場合、トピックに注釈を追加してください。"},
         {"role": "user", "content": change}
     ],
-    temperature=0.3
+    temperature=0.2
 )
 summary = response2.choices[0].message.content
 
